@@ -3,6 +3,7 @@ package br.com.fiap.money_control_api.controller;
 
 import br.com.fiap.money_control_api.model.Category;
 import br.com.fiap.money_control_api.repository.CategoryRepository;
+import jakarta.validation.Valid;
 
 // import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class CategoryController {
 	}
 	@PostMapping
 	@ResponseStatus(code=HttpStatus.CREATED)
-	public ResponseEntity<Category> create(@RequestBody Category category){
+	public ResponseEntity<Category> create(@RequestBody @Valid Category category){
 		log.info("Cadastrando Categorias "+ category.getName());
 		repository.save(category);
 		return ResponseEntity.status(201).body(category);
