@@ -1,16 +1,12 @@
 package br.com.fiap.money_control_api.controller;
 
-
-import br.com.fiap.money_control_api.model.Category;
-import br.com.fiap.money_control_api.repository.CategoryRepository;
-import jakarta.validation.Valid;
-
-// import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,54 +16,71 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.com.fiap.money_control_api.model.Category;
+import br.com.fiap.money_control_api.repository.CategoryRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
-	private final Logger log=LoggerFactory.getLogger(getClass());
-	//Injecao de Dependencia
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	// Injeção de Dependência
 	@Autowired
 	private CategoryRepository repository;
-    @GetMapping
-	public List<Category> index(){
+
+	@GetMapping
+	@Cacheable("categories")
+	@Operation(tags = "Category", summary = "Listar categorias", description = "Devolve a lista de categorias com paginação e filtro...")
+	public List<Category> index() {
 		return repository.findAll();
 	}
+
 	@PostMapping
-	@ResponseStatus(code=HttpStatus.CREATED)
-	public ResponseEntity<Category> create(@RequestBody @Valid Category category){
-		log.info("Cadastrando Categorias "+ category.getName());
+	@ResponseStatus(code = HttpStatus.CREATED)
+	@Operation(responses = @ApiResponse(responseCode = "400", description = "Validação falhou"))
+	@CacheEvict(value = "categories", allEntries = true)
+	public ResponseEntity<Category> create(@RequestBody @Valid Category category) {
+		log.info("Cadastrando categoria " + category.getName());
 		repository.save(category);
 		return ResponseEntity.status(201).body(category);
 	}
+
 	@GetMapping("{id}")
-	public Category get(@PathVariable Long id){
-		log.info("buscando categoria "+id);
+	public Category get(@PathVariable Long id) {
+		log.info("buscando categoria " + id);
 		return getCategory(id);
 	}
+
 	@DeleteMapping("{id}")
+	@CacheEvict(value = "categories", allEntries = true)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void destroy(@PathVariable Long id){
-		log.info("Apagando categorias "+id);
+	public void destroy(@PathVariable Long id) {
+		log.info("Apagando categoria " + id);
 		repository.delete(getCategory(id));
 	}
+
 	@PutMapping("{id}")
-	public Category update(@PathVariable Long id, @RequestBody Category category){
-		log.info("Atualizando categoria: "+id+" para "+category);
+	@CacheEvict(value = "categories", allEntries = true)
+	public Category update(@PathVariable Long id, @RequestBody Category category) {
+		log.info("Atualizando categoria " + id + " para " + category);
+
 		category.setId(id);
-		repository.save(category);
-		return category;
+		return repository.save(category);
+	}
+
+	private Category getCategory(Long id) {
+		return repository
+				.findById(id)
+				.orElseThrow(
+						() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
 	}
-	private Category getCategory(Long id) {
-		return repository.findById(id).
-				orElseThrow(
-					()->new ResponseStatusException(HttpStatus.NOT_FOUND)
-			);
-			//exception
-	}
-    
+
 }
