@@ -1,17 +1,12 @@
 package br.com.fiap.money_control_api.config;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -22,25 +17,27 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth->auth
             .requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
             .requestMatchers("/transactions/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST,"/users/**").permitAll()
             .anyRequest().authenticated()
         )
+        .csrf(csrf -> csrf.disable())
         .httpBasic(Customizer.withDefaults())
         .build();
     }
 
-    @Bean
-    UserDetailsService userDetailsService() {
-        var user1=User.withUsername("gabriel")
-        .password("$2a$12$cqqq/j0Mq/Fk36QKAq3.ke36yuhwkmNrJLVBwhSJGMu0TkQCl9Q4K")
-        .roles("ADMIN")
-        .build();
-        var user2=User.withUsername("maria")
-        .password("$2a$12$x0Az8q6EHega0Na61JFhouuEeX62or7n0RgSv14iZtNTY6Xa7hPV2")
-        .roles("USER")
-        .build();
-        var users=List.of(user1,user2);
-        return new InMemoryUserDetailsManager(users);
-    }
+    // @Bean
+    // UserDetailsService userDetailsService() {
+    //     var user1=User.withUsername("gabriel")
+    //     .password("$2a$12$cqqq/j0Mq/Fk36QKAq3.ke36yuhwkmNrJLVBwhSJGMu0TkQCl9Q4K")
+    //     .roles("ADMIN")
+    //     .build();
+    //     var user2=User.withUsername("maria")
+    //     .password("$2a$12$x0Az8q6EHega0Na61JFhouuEeX62or7n0RgSv14iZtNTY6Xa7hPV2")
+    //     .roles("USER")
+    //     .build();
+    //     var users=List.of(user1,user2);
+    //     return new InMemoryUserDetailsManager(users);
+    // }
     
     @Bean
     PasswordEncoder passwordEncoder() {
