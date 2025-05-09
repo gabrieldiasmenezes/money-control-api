@@ -13,13 +13,14 @@ import br.com.fiap.money_control_api.service.TokenService;
 @RestController
 public class AuthController {
 
-    @Autowired
-    AuthenticationManager authManager;
     public record Token (String token,String email){}
     record Credentials (String email,String password){}
 
     @Autowired
     private TokenService tokenService;
+    
+    @Autowired
+    AuthenticationManager authManager;
 
     @PostMapping("/login")
     public Token login(@RequestBody Credentials credentials){

@@ -46,7 +46,7 @@ public class AuthFilter extends OncePerRequestFilter {
             System.out.println(user);
             
             //autenticar usuario
-            var authentication = new UsernamePasswordAuthenticationToken(user,null);
+            var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request,response);
