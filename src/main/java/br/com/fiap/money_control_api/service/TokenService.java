@@ -15,7 +15,7 @@ import br.com.fiap.money_control_api.model.User;
 
 @Service
 public class TokenService {
-    Instant expiresAt = LocalDateTime.now().plusMinutes(10).toInstant(ZoneOffset.ofHours(-3));
+    Instant expiresAt = LocalDateTime.now().plusMinutes(120).toInstant(ZoneOffset.ofHours(-3));
     Algorithm algorithm=Algorithm.HMAC256("secret");
     public Token createToken(User user){
        var jwt= JWT.create()
@@ -32,7 +32,7 @@ public class TokenService {
         return User.builder()
                 .id(Long.valueOf(verifiedToken.getSubject()))
                 .email(verifiedToken.getClaim("email").toString())
-                .role(UserRole.valueOf(verifiedToken.getClaim("role").toString()))
+                .role(UserRole.valueOf(verifiedToken.getClaim("role").asString()))
                 .build();
     }
 }

@@ -30,22 +30,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "USERS")
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+public class User implements UserDetails{
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is mandatory")
-    @Column(unique=true)
+
+    @Email(message = "e-mail inválido")
+    @NotBlank(message = "campo obrigatório")
+    @Column(unique = true)
     private String email;
-    @Size(min=5, message = "Password must be at least 5 characters long")
+
+    @Size(min = 5, message = "deve ter pelo menos 5 caracteres")
     private String password;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.toString()));
     }
+
     @Override
     public String getUsername() {
         return email;

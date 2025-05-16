@@ -13,13 +13,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 @Component
 public class AuthFilter extends OncePerRequestFilter {
-
-
     @Autowired
-    TokenService tokenService;
+    private TokenService tokenService;
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
@@ -52,7 +50,7 @@ public class AuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
 
 
-        
+       
     }
     
 }

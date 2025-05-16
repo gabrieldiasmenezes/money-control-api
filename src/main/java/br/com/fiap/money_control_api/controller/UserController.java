@@ -17,19 +17,19 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     @Autowired
     private UserRepository repository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @PostMapping
-    @ResponseStatus(code=HttpStatus.CREATED)
-    public UserResponse createUser(@RequestBody @Valid User user) {
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public UserResponse create(@RequestBody @Valid User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        var userSaved=repository.save(user);
-        return new UserResponse(userSaved.getId(),userSaved.getEmail(),userSaved.getRole());
+        var userSaved = repository.save(user);
+        return new UserResponse(userSaved.getId(),userSaved.getEmail(), userSaved.getRole());
     }
-    
     
 }
